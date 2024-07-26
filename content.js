@@ -49,19 +49,23 @@ function detectStoryAndAppendTimerElement() {
 }
 
 function detectGoogleCalendarEvent() {
-    const googleCalendarEventContainer = document.querySelector('[data-open-edit-note]');
+    const googleCalendarEventContainer = document.querySelector('[data-open-edit-note]') || document.querySelector('[data-is-adaptive]');
     const eventHeaderElement = document.querySelector('.wv9rPe');
 
     if(!googleCalendarEventContainer || !eventHeaderElement) {
         return;
     }
 
+    
     const harvestTimerID = "polaris-harvest-timer";
 
     if(!document.getElementById(harvestTimerID)) {
-        const eventName = document.querySelector('[data-open-edit-note] [data-text]').textContent;
-        const eventId = googleCalendarEventContainer.getAttribute('data-eventid');
-
+        const eventName = googleCalendarEventContainer.querySelector('[data-text]')?.textContent;
+        // For two different types of google calendar event modals
+        // 1- Meeting Invites
+        // 2- Focus Time
+        const eventId = googleCalendarEventContainer.getAttribute('data-eventid') || googleCalendarEventContainer.querySelector('[data-eventid]')?.getAttribute('data-eventid');
+      
         createStartTimerButton("google-calendar", eventHeaderElement, harvestTimerID, eventId, eventName);
 
         window._harvestPlatformConfig = {
