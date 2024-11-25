@@ -16,8 +16,12 @@ document.addEventListener('DOMContentLoaded', (e) => {
         };
 
         if (result.google_calendar_timer_started) {
-            const googleCalendarTimerElement = document.getElementById('google_calendar_event_box');
+            const googleCalendarTimerElement = document.getElementById('gc_toggle_action');
+            const googleCalendarToggleSwitch = document.getElementById('gc_toggle_switch');
+            
             createStopTimerButton('google-calendar', googleCalendarTimerElement, result.google_calendar_timer_started?.external_reference);
+            googleCalendarToggleSwitch?.style.setProperty('display', 'none');
+
             googleCalendarCheckbox.setAttribute('disabled', true);
 
             const event = new CustomEvent("harvest-event:timers:add", {
@@ -27,8 +31,12 @@ document.addEventListener('DOMContentLoaded', (e) => {
         }
 
         else if (result.harvest_timer_started) {
-            const shortcutTimerElement = document.getElementById('shortcut_event_box');
+            const shortcutTimerElement = document.getElementById('shortcut_toggle_action');
+            const shortcutToggleSwitch = document.getElementById('shortcut_toggle_switch');
+
             createStopTimerButton('shortcut', shortcutTimerElement, result.harvest_timer_started?.external_reference);
+            shortcutToggleSwitch?.style.setProperty('display', 'none');
+            
             shortcutCheckbox.setAttribute('disabled', true);
 
             const event = new CustomEvent("harvest-event:timers:add", {
@@ -75,16 +83,6 @@ function createStopTimerButton(type, elementToAppend, data) {
 
 
     let timerElement = document.createElement('div');
-
-    switch (type) {
-        case "shortcut":
-            timerElement.style = "margin: 0px 20px;";
-            break;
-        case "google-calendar":
-            timerElement.style = "margin: 0px 20px; margin-top: 4px;";
-            break;
-    }
-
     timerElement.innerHTML = `
         <div class="harvest_timer_btn_div"> </div>
     `;
@@ -113,15 +111,15 @@ window.onmessage = (event) => {
         }
 
         // Mark the checkbox as enabled
-        const googleCalendarCheckbox = document.getElementById('google_calendar');
-        const shortcutCheckbox = document.getElementById('shortcut');
-        
-        if(shortcutCheckbox) {
-            shortcutCheckbox.removeAttribute('disabled');
+        const googleCalendarToggleSwitch = document.getElementById('gc_toggle_switch');
+        const shortcutToggleSwitch = document.getElementById('shortcut_toggle_switch');
+
+        if(googleCalendarToggleSwitch) {
+            googleCalendarToggleSwitch.style.setProperty('display', 'block');
         }
 
-        if(googleCalendarCheckbox) {
-            googleCalendarCheckbox.removeAttribute('disabled');
+        if(shortcutToggleSwitch) {
+            shortcutToggleSwitch.style.setProperty('display', 'block');
         }
         
     }

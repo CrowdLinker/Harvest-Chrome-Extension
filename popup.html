@@ -1,52 +1,152 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Shortcut Story Timer</title>
-  <style>
-    @font-face {
-      font-family: 'Work Sans, sans-serif';
-      src: url('assets/fonts/WorkSans-Medium.ttf') format('truetype');
-      font-style: normal;
-      font-optical-sizing: auto;
-      font-style: normal;
-    }
 
-    body { 
-      font-family: 'Work Sans, sans-serif';
+<head>
+  <title>Harvest Timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       border-radius: 10px;
       margin: 0;
-      min-width: 600px;
+      min-width: 500px;
     }
 
+    .timer_card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .card-description {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .toggle-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .toggle-label {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-name {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .app-description {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .toggle-input {
+      display: none;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+      background-color: #ccc;
+      border-radius: 20px;
+      transition: all 0.3s;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background-color: white;
+      top: 1px;
+      left: 1px;
+      transition: all 0.3s;
+    }
+
+    .toggle-input:checked+.toggle-switch {
+      background-color: #040320;
+    }
+
+    .toggle-input:checked+.toggle-switch::after {
+      transform: translateX(20px);
+    }
   </style>
 </head>
+
 <body>
   <div>
     <div style="background-color: #040320; padding: 8px; padding-top: 20px;padding-bottom: 20px;">
-      <img style="width: 160px; height: auto;" src="https://assets-global.website-files.com/614a527a67b7239eef790279/615e090604f2852f3a04f412_Logo.svg" alt="Shortcut Story Timer" width="100" height="100">
+      <img style="width: 160px; height: auto;"
+        src="https://assets-global.website-files.com/614a527a67b7239eef790279/615e090604f2852f3a04f412_Logo.svg"
+        alt="Shortcut Story Timer" width="100" height="100">
     </div>
-    <div style="padding: 20px">
-      <strong><h2 style="margin: 0;font-weight: 800; font-size: 24px;">Time Tracking Tool</h2></strong>
+    <div class="timer_card" style="padding: 20px">
+      <div class="card-header">
+        <h2 class="card-title" style="margin: 0;font-weight: 800; font-size: 24px;">Harvest Timer</h2>
+        <p class="card-description">Enable time tracking for your apps</p>
+      </div>
 
-      <div style="margin-top: 20px;">
-        <h3 style=" margin-bottom: 10px; font-size:16px;">Enable Time Tracking</h3>
-        <div style="display: flex; flex-flow: column; gap: 10px">
-            <div id="google_calendar_event_box" style="font-size:14px; display: flex; align-items: center; gap: 6px">
-              <input type="checkbox" id="google_calendar" name="google_calendar"/>
-              <label for="google_calendar">Google Calendar</label>
-            </div>
-
-
-            <div id="shortcut_event_box" style="font-size:14px;  display: flex; align-items: center; gap: 6px">
-              <input type="checkbox" id="shortcut" name="shortcut" />
-              <label for="shortcut">Shortcut Board</label>
-            </div>
+      <div class="card-content">
+        <div class="toggle-container">
+          <label for="shortcut" class="toggle-label">
+            <span class="app-name">Shortcut App</span>
+            <span class="app-description">Track time from Shortcut Board</span>
+          </label>
+          <div id="shortcut_toggle_action">
+              <div id="shortcut_toggle_switch">
+                  <input type="checkbox" id="shortcut" class="toggle-input" name="shortcut">
+                  <label for="shortcut" class="toggle-switch"></label>
+              </div>
+          </div>
         </div>
-      </div>  
+        <div class="toggle-container">
+          <label for="google_calendar" class="toggle-label">
+            <span class="app-name">Google Calendar</span>
+            <span class="app-description">Track time from Google Calendar events</span>
+          </label>
+          <div id="gc_toggle_action">
+            <div id="gc_toggle_switch">
+                <input type="checkbox" id="google_calendar" name="google_calendar" class="toggle-input">
+                <label for="google_calendar" class="toggle-switch"></label>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script type="module" src="popup.js"></script>
   <script src="harvest-script.js"></script>
 </body>
+
 </html>
