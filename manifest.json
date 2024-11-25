@@ -1,0 +1,49 @@
+{
+    "manifest_version": 3,
+    "name": "Crowdlinker - Time Tracking Assistant",
+    "version": "1.0",
+    "description": "Allow users to start Harvest timer from different applications.",
+    "permissions": [
+      "tabs",
+      "activeTab",
+      "scripting",
+      "storage",
+      "webRequest",
+      "cookies"
+    ],
+    "host_permissions": [
+      "https://app.shortcut.com/*",
+      "https://platform.harvestapp.com/*",
+      "https://calendar.google.com/*"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://app.shortcut.com/*"],
+        "js": ["content.js"]
+      },
+      {
+        "matches": ["https://calendar.google.com/*"],
+        "js": ["content.js"]
+      },
+      {
+        "matches": ["<all_urls>"],
+        "js": ["constants.js"],
+        "type": "module"
+      }
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "assets/icons/default.png",
+        "48": "assets/icons/default.png",
+        "128": "assets/icons/default.png"
+      }
+    },
+    "content_security_policy": {
+      "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; script-src-elem 'self' 'unsafe-inline' 1s2d3f4g5h6j7k8l9z0x",
+      "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval'; child-src 'self';"
+    }
+  }
