@@ -92,6 +92,7 @@ function createStopTimerButton(type, elementToAppend, data) {
     timerElement.appendChild(buttonElement);
 
     elementToAppend.appendChild(timerElement);
+    
 }
 
 window.onmessage = (event) => {
