@@ -27,6 +27,11 @@
       {
         "matches": ["https://calendar.google.com/*"],
         "js": ["content.js"]
+      },
+      {
+        "matches": ["<all_urls>"],
+        "js": ["constants.js"],
+        "type": "module"
       }
     ],
     "action": {

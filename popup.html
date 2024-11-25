@@ -13,37 +13,40 @@
 
     body { 
       font-family: 'Work Sans, sans-serif';
-      width: 400px; margin: 0
+      border-radius: 10px;
+      margin: 0;
+      min-width: 400px;
     }
 
   </style>
 </head>
 <body>
-  <div>
+  <div style="">
     <div style="background-color: #040320; padding: 8px; padding-top: 20px;padding-bottom: 20px;">
-      <img style="width: 120px; height: auto;" src="https://assets-global.website-files.com/614a527a67b7239eef790279/615e090604f2852f3a04f412_Logo.svg" alt="Shortcut Story Timer" width="100" height="100">
+      <img style="width: 160px; height: auto;" src="https://assets-global.website-files.com/614a527a67b7239eef790279/615e090604f2852f3a04f412_Logo.svg" alt="Shortcut Story Timer" width="100" height="100">
     </div>
-    <div style="padding: 10px">
-      <strong><h2 style="margin: 0;font-weight: 700;">Time Tracking Assistant</h2></strong>
+    <div style="padding: 20px">
+      <strong><h2 style="margin: 0;font-weight: 800; font-size: 24px;">Internal Time Tracking</h2></strong>
 
       <div style="margin-top: 20px;">
-        <h3 style=" margin-bottom: 10px;">Enable Time Tracking</h3>
+        <h3 style=" margin-bottom: 10px; font-size:16px;">Enable Time Tracking</h3>
         <div style="display: flex; flex-flow: column; gap: 10px">
-            <div >
+            <div id="google_calendar_event_box" style="font-size:14px; display: flex; align-items: center; gap: 6px">
               <input type="checkbox" id="google_calendar" name="google_calendar"/>
               <label for="google_calendar">Google Calendar</label>
             </div>
-          
-            <div >
+
+
+            <div id="shortcut_event_box" style="font-size:14px;  display: flex; align-items: center; gap: 6px">
               <input type="checkbox" id="shortcut" name="shortcut" />
-              <label for="shortcut">Shortcut App</label>
+              <label for="shortcut">Shortcut Board</label>
             </div>
         </div>
-      </div>
-  
+      </div>  
     </div>
   </div>
 
-  <script src="popup.js"></script>
+  <script type="module" src="popup.js"></script>
+  <script src="harvest-script.js"></script>
 </body>
 </html>
