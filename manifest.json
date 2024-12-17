@@ -29,6 +29,10 @@
         "js": ["content.js"]
       },
       {
+        "matches": ["https://crowdlinker.harvestapp.com/*"],
+        "js": ["content.js"]
+      },
+      {
         "matches": ["<all_urls>"],
         "js": ["constants.js"],
         "type": "module"
