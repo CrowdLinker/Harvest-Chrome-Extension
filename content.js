@@ -1,4 +1,4 @@
-function findShortcutStoryElementAndAppendTimer(hasGoogleCalendarTimerStarted, hasShortcutTimerStarted) { 
+function findShortcutStoryElementAndAppendTimer(hasTimerStarted) { 
     const shortcutStoryModalContainerId = "story-dialog-parent";
 
     const storyModal = document.getElementById(shortcutStoryModalContainerId);
@@ -11,9 +11,6 @@ function findShortcutStoryElementAndAppendTimer(hasGoogleCalendarTimerStarted, h
     const harvestTimerID = "polaris-harvest-timer";
 
     if (storyModal) {
-        // chrome.runtime.sendMessage({ action: 'checkIfHarvestTimerIsRunning' }, function(response) {
-        // });
-
         const {
             storyId,
             storyName,
@@ -29,7 +26,7 @@ function findShortcutStoryElementAndAppendTimer(hasGoogleCalendarTimerStarted, h
                 return;
             }
 
-            createTimeActionButton("shortcut", elementToAppendId, harvestTimerID, storyId, storyName, storyPermaLink, hasGoogleCalendarTimerStarted, hasShortcutTimerStarted);
+            createTimeActionButton("shortcut", elementToAppendId, harvestTimerID, storyId, storyName, storyPermaLink, hasTimerStarted);
 
             window._harvestPlatformConfig = {
                 "applicationName": "Crowdlinker",
@@ -46,7 +43,7 @@ function findShortcutStoryElementAndAppendTimer(hasGoogleCalendarTimerStarted, h
     }
 }
 
-function findGoogleCalendarEventAndAppendTimer(hasGoogleCalendarTimerStarted, hasShortcutTimerStarted) {
+function findGoogleCalendarEventAndAppendTimer(hasTimerStarted) {
     const googleCalendarEventContainer = document.querySelector('[data-open-edit-note]') || document.querySelector('[data-is-adaptive]');
     const eventHeaderElement = document.querySelector('.wv9rPe');
 
@@ -64,7 +61,7 @@ function findGoogleCalendarEventAndAppendTimer(hasGoogleCalendarTimerStarted, ha
         // 2- Focus Time
         const eventId = googleCalendarEventContainer.getAttribute('data-eventid') || googleCalendarEventContainer.querySelector('[data-eventid]')?.getAttribute('data-eventid');
 
-        createTimeActionButton("google-calendar", eventHeaderElement, harvestTimerID, eventId, eventName, '', hasGoogleCalendarTimerStarted, hasShortcutTimerStarted);
+        createTimeActionButton("google-calendar", eventHeaderElement, harvestTimerID, eventId, eventName, '', hasTimerStarted);
 
         window._harvestPlatformConfig = {
             "applicationName": "Crowdlinker",
@@ -96,11 +93,11 @@ window.addEventListener("load", () => {
     //     observer.observe(document.body, { childList: true, subtree: true });
     //   }
     setInterval(() => {
-        chrome.storage.sync.get(['shortcutCheckBox', 'googleCalendarCheckBox', 'harvest_timer_started', 'google_calendar_timer_started'], (result) => {
-            const { shortcutCheckBox, googleCalendarCheckBox, harvest_timer_started, google_calendar_timer_started } = result;
+        chrome.storage.sync.get(['shortcutCheckBox', 'googleCalendarCheckBox', 'harvest_timer_started'], (result) => {
+            const { shortcutCheckBox, googleCalendarCheckBox, harvest_timer_started } = result;
             if(window.location.href.includes(APP_CONSTANTS.SHORTCUT.baseDomain)) {
-                if(shortcutCheckBox && !google_calendar_timer_started) {
-                    findShortcutStoryElementAndAppendTimer(!!google_calendar_timer_started?.external_reference, !!harvest_timer_started?.external_reference);
+                if(shortcutCheckBox) {
+                    findShortcutStoryElementAndAppendTimer(!!harvest_timer_started?.external_reference);
                 } else if(!harvest_timer_started) {
                     const timerElement = document.getElementById("polaris-harvest-timer");
                     if (timerElement) {
@@ -109,9 +106,9 @@ window.addEventListener("load", () => {
                 }
 
             } else if(window.location.href.includes(APP_CONSTANTS.GOOGLE_CALENDAR.baseDomain)) {
-                if(googleCalendarCheckBox && !harvest_timer_started) {
-                    findGoogleCalendarEventAndAppendTimer(!!google_calendar_timer_started?.external_reference, !!harvest_timer_started?.external_reference);
-                } else if(!google_calendar_timer_started) {
+                if(googleCalendarCheckBox) {
+                    findGoogleCalendarEventAndAppendTimer(!!harvest_timer_started?.external_reference);
+                } else if(!harvest_timer_started) {
                     const timerElement = document.getElementById("polaris-harvest-timer");
                     if (timerElement) {
                         timerElement.remove();
@@ -170,7 +167,7 @@ window.onmessage = (event) => {
     }
 };
 
-function createTimeActionButton(type, elementToAppend, harvestTimerID, id, name, storyPermaLink, hasGoogleCalendarTimerStarted, hasShortcutTimerStarted) {
+function createTimeActionButton(type, elementToAppend, harvestTimerID, id, name, storyPermaLink, hasTimerStarted) {
         
     let buttonElement = document.getElementById("start_time_btn");
     if (!buttonElement) {
@@ -183,19 +180,16 @@ function createTimeActionButton(type, elementToAppend, harvestTimerID, id, name,
     buttonElement.style = "background: transparent; cursor: pointer; padding: 8px; border-radius: 8px; border: 1px solid grey; color: #fff; font-weight: 700; font-size: 14px; border: none;";
     
 
-    buttonElement.innerHTML =
-        type === "shortcut" ? hasShortcutTimerStarted ? "Stop Timer" : "Start Timer"
-            : hasGoogleCalendarTimerStarted ? "Stop Timer" : "Start Timer";
-    buttonElement.style.backgroundColor =
-        type === "shortcut" ? hasShortcutTimerStarted ? "rgb(189 54 54)" : "#188433"
-            : hasGoogleCalendarTimerStarted ? "rgb(189 54 54)" : "#188433";
+    buttonElement.innerHTML = hasTimerStarted ? "Stop Timer" : "Start Timer";
+    buttonElement.style.backgroundColor = hasTimerStarted ? "rgb(189 54 54)" : "#188433";
 
     switch (type) {
         case "shortcut":
             buttonElement.dataset.item = JSON.stringify({
                 "id": id,
                 "name": `${id} - ${name}`,
-                "permalink": storyPermaLink || ''
+                "permalink": storyPermaLink || '',
+                "type": "shortcut_app"
             });
 
             break;
@@ -203,7 +197,8 @@ function createTimeActionButton(type, elementToAppend, harvestTimerID, id, name,
             buttonElement.dataset.item = JSON.stringify({
                 "id": id,
                 "name": `Meeting - ${name}`,
-                "permalink": APP_CONSTANTS.GOOGLE_CALENDAR.baseDomain
+                "permalink": APP_CONSTANTS.GOOGLE_CALENDAR.baseDomain,
+                "type": "google_calendar"
             });
 
     }
@@ -237,14 +232,23 @@ function handleStartTimeEvent(eventValue) {
         buttonElement.innerHTML = "Stop Timer";
         buttonElement.style.backgroundColor = "rgb(189 54 54)";
 
-        if (eventValue?.external_reference?.permalink?.includes(APP_CONSTANTS.SHORTCUT.baseDomain)) {
-            // window.localStorage.setItem("harvest_timer_started", JSON.stringify(eventValue));
-            chrome.storage.sync.set({ 'harvest_timer_started': eventValue });
+        if (eventValue?.external_reference?.permalink?.includes(APP_CONSTANTS.SHORTCUT.baseDomain) || eventValue?.external_reference?.permalink?.includes(APP_CONSTANTS.GOOGLE_CALENDAR.baseDomain)) {
+            const serviceType = getServiceTypeByDomain(eventValue?.external_reference?.permalink);
+            chrome.storage.sync.set({ 'harvest_timer_started': {
+                ...eventValue,
+                service_type: serviceType
+            } });
         }
-        else if (eventValue?.external_reference?.permalink?.includes(APP_CONSTANTS.GOOGLE_CALENDAR.baseDomain)) {
-            // window.localStorage.setItem("google_calendar_timer_started", JSON.stringify(eventValue));
-            chrome.storage.sync.set({ 'google_calendar_timer_started': eventValue });
-        }
+    }
+}
+
+function getServiceTypeByDomain(domain) {
+    if (domain.includes(APP_CONSTANTS.SHORTCUT.baseDomain)) {
+        return "shortcut";
+    }
+
+    if (domain.includes(APP_CONSTANTS.GOOGLE_CALENDAR.baseDomain)) {
+        return "google_calendar";
     }
 }
 
@@ -255,13 +259,8 @@ function handleStopTimeEvent(eventValue) {
         buttonElement.innerHTML = "Start Timer";
         buttonElement.style.backgroundColor = "#188433";
 
-        if (eventValue?.external_reference?.permalink?.includes(APP_CONSTANTS.SHORTCUT.baseDomain)) {
-            window.localStorage.removeItem("harvest_timer_started");
+        if (eventValue?.external_reference?.permalink?.includes(APP_CONSTANTS.SHORTCUT.baseDomain) || eventValue?.external_reference?.permalink?.includes(APP_CONSTANTS.GOOGLE_CALENDAR.baseDomain)) {
             chrome.storage.sync.remove('harvest_timer_started');
-        }
-        else if (eventValue?.external_reference?.permalink?.includes(APP_CONSTANTS.GOOGLE_CALENDAR.baseDomain)) {
-            window.localStorage.removeItem("google_calendar_timer_started");
-            chrome.storage.sync.remove('google_calendar_timer_started');
         }
 
     }
@@ -271,9 +270,9 @@ function handleStopTimeEvent(eventValue) {
 // Listen for chrome storage changes
 chrome.storage.onChanged.addListener((changes, namespace) => {
     if(namespace === 'sync'){
-        if(changes.google_calendar_timer_started || changes.harvest_timer_started) {
-            const olderValue = (changes?.google_calendar_timer_started?.oldValue) || (changes?.harvest_timer_started?.oldValue);
-            const newValue = (changes?.google_calendar_timer_started?.newValue) || (changes?.harvest_timer_started?.newValue); 
+        if(changes.harvest_timer_started) {
+            const olderValue = changes?.harvest_timer_started?.oldValue;
+            const newValue = changes?.harvest_timer_started?.newValue; 
 
             // Timer stopped state, since value is removed
             if(!newValue && olderValue?.external_reference) {
@@ -281,4 +280,23 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             }
         }
     }
+});
+
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'harvestAppDetected') {
+        // Check if timer is stopped
+        const stopTimerElement = document.querySelector(".js-stop-timer");
+        if(!stopTimerElement) {
+            console.log("No timer is running.");
+            return;
+        }
+
+        stopTimerElement.addEventListener('click', () => {
+            console.log("Timer stopped.");  
+            chrome.storage.sync.remove('harvest_timer_started');
+        });
+    }
+
+    return true;
 });

@@ -7,6 +7,23 @@ chrome.runtime.onInstalled.addListener(async () => {
   }
 });
 
+
+// Listener for tab update
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && (tab.url.startsWith('https://app.shortcut.com/') || tab.url.startsWith('https://calendar.google.com/'))) {
+      await executeScript(tab);
+  }
+
+  await detectIfTimerStoppedFromHarvest(tab);
+});
+
+// Listener for tab change
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  const tab = await chrome.tabs.get(activeInfo.tabId);
+  await detectIfTimerStoppedFromHarvest(tab);
+});
+
+
 async function executeScript(tab) {
   try {
     // Avoid running in chrome:// pages
@@ -37,19 +54,7 @@ async function getCurrentTab() {
   return tab;
 }
 
-
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && (tab.url.startsWith('https://app.shortcut.com/') || tab.url.startsWith('https://calendar.google.com/'))) {
-      await executeScript(tab);
-  }
-});
-
- // Listen for changes in local storage and update the timer display in real-time
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  console.log({ changes, namespace })
-  if (namespace === 'local') {
-  }   
-});
+// Check if Harvest website is open in browser
 
 
 // !NOTE: Not used
@@ -64,4 +69,19 @@ async function checkIfHarvestTimerIsRunning() {
   } catch (error) {
     console.error("Failed to fetch running time entry.", error);
   }
+}
+
+
+async function detectIfTimerStoppedFromHarvest(tab) {
+
+  if(!tab.url.includes("crowdlinker.harvestapp.com")) {
+    return
+  }
+
+  if(!tab?.active) {
+    return;
+  }
+
+  // Send message to content script to check if timer is timerStopped
+  await chrome.tabs.sendMessage(tab.id, { action: 'harvestAppDetected' });
 }
