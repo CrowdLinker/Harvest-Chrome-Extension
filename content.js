@@ -17,16 +17,17 @@ function findShortcutStoryElementAndAppendTimer(hasTimerStarted) {
             storyPermaLink
         } = getShortcutStoryDetails();
 
-        const elementToAppendId = document.getElementById('cid-breadcrumbs-story-dialog');
-        if (elementToAppendId) {
+        // Find the story-details element within scrollable-content to insert timer button as first element
+        const storyDetails = document.querySelector('.content.story-container .scrollable-content .story-details');
+        if (storyDetails) {
 
-            console.log("Element found to append timer.");
+            console.log("Story details found to append timer.");
             if (!storyId || !storyName || !storyPermaLink) {
                 console.log("Story details not found.");
                 return;
             }
 
-            createTimeActionButton("shortcut", elementToAppendId, harvestTimerID, storyId, storyName, storyPermaLink, hasTimerStarted);
+            createTimeActionButton("shortcut", storyDetails, harvestTimerID, storyId, storyName, storyPermaLink, hasTimerStarted);
 
             window._harvestPlatformConfig = {
                 "applicationName": "Crowdlinker",
@@ -207,10 +208,14 @@ function createTimeActionButton(type, elementToAppend, harvestTimerID, id, name,
 
     switch (type) {
         case "shortcut":
-            timerElement.style = "float:right; margin: 0px 20px;";
+            // Display as block element on its own line
+            timerElement.style = "display: block; margin-bottom: 12px; width: 100%;";
+            buttonElement.style.display = "inline-block";
             break;
         case "google-calendar":
             timerElement.style = "float:right; margin: 0px 20px; position: absolute; left: 0; margin-top: 4px;";
+            // Reset display property for google-calendar to avoid persisting inline-block from shortcut
+            buttonElement.style.display = "";
             break;
     }
 
@@ -221,7 +226,12 @@ function createTimeActionButton(type, elementToAppend, harvestTimerID, id, name,
 
     timerElement.appendChild(buttonElement);
 
-    elementToAppend.appendChild(timerElement);
+    // Insert as first element for shortcut, otherwise append
+    if (type === "shortcut") {
+        elementToAppend.insertBefore(timerElement, elementToAppend.firstChild);
+    } else {
+        elementToAppend.appendChild(timerElement);
+    }
 }
 
 
